@@ -1,8 +1,3 @@
-Here is a clear, professional **PRODUCT SPEC** you can paste directly into your repo under
-`/docs/PRODUCT_SPEC.md` or `README.md`.
-
-It’s concise enough for a portfolio but complete enough to guide development.
-
 ---
 
 # **QuickPay – Product Specification**
