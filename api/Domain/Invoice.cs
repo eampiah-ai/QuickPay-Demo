@@ -2,7 +2,7 @@ namespace api.Domain;
 
 public enum Status
 {
-    Draft,
+    Pending,
     Sent,
     Paid,
     Overdue

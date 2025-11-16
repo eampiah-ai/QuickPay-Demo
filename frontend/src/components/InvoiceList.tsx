@@ -28,6 +28,7 @@ import { MoreHorizontal } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { MdAddCircle } from "react-icons/md";
 
 export interface Invoice {
   id: string;
@@ -159,8 +160,14 @@ export default function InvoiceList() {
   if (isError) return <div>An error occurred.</div>;
 
   return (
-    <div>
-      <Button onClick={() => navigate("/invoices/new")}>New Invoice</Button>
+    <div className="p-5">
+      <div className="flex flex-row items-center gap-5">
+        <h1 className="text-[3em]">Invoices</h1>
+        <Button className="cursor-pointer" onClick={() => navigate("/invoices/new")}>
+          <MdAddCircle />
+          New Invoice
+        </Button>
+      </div>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

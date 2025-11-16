@@ -21,7 +21,7 @@ public class Datagen(CustomerDb customerDb, InvoiceDb invoiceDb)
         customerDb.SaveChanges();
     }
 
-    public void GenerateInvoices(int count = 1)
+    public void GenerateInvoices(int count = 3)
     {
         var customers = customerDb.Customers.ToList();
         if (customers.Count == 0) throw new Exception("Need to populate customer table prior to creating Invoices");
@@ -36,9 +36,10 @@ public class Datagen(CustomerDb customerDb, InvoiceDb invoiceDb)
                     Id = Guid.NewGuid().ToString(),
                     CustomerId = customer.Id,
                     AmountCents = Random.Shared.Next(1000) * 10000,
+                    Status = (Status)Enum.GetValues(typeof(Status)).GetValue(Random.Shared.Next(Enum.GetValues(typeof(Status)).Length)),
                     Description = "test description",
-                    PublicId = "public-id",
-                    DueDate = DateTime.Now.AddDays(-Random.Shared.Next(100))
+                    PublicId = Guid.NewGuid().ToString(),
+                    DueDate = Random.Shared.Next(10) % 3 == 0 ? DateTime.Now.AddDays(Random.Shared.Next(100)) : DateTime.Now.AddDays(-Random.Shared.Next(100))
                 };
                 invoices.Add(invoice);
             }
