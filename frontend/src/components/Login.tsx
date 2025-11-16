@@ -11,7 +11,6 @@ export default function Login() {
   const { register, handleSubmit } = useForm<LoginData>();
 
   const login = (data: LoginData) => {
-    console.log(data);
     const request = new Request("http://localhost:5250/api/auth", {
       method: "POST",
       headers: {
@@ -26,7 +25,7 @@ export default function Login() {
         return;
       }
 
-      response.json().then(console.log)
+      response.json().then(console.log);
     });
   };
 

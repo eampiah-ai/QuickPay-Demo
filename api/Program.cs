@@ -78,6 +78,7 @@ if (app.Environment.IsDevelopment())
     System.Console.WriteLine("Generating sample data...");
     var datagen = scope.ServiceProvider.GetRequiredService<Datagen>();
     datagen.GenerateCustomers();
+    datagen.GenerateInvoices();
     System.Console.WriteLine("Sample data generation complete.");
 }
 app.UseCors(MyAllowSpecificOrigins);

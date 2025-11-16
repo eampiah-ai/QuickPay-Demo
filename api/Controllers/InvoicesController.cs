@@ -23,10 +23,17 @@ public class InvoicesController(InvoiceDb db) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create(Invoice invoice)
+    public async Task<ActionResult> Create(CreateInvoiceDto dto)
     {
-        // explicitly set id
-        invoice.Id = Guid.NewGuid().ToString();
+        var invoice = new Invoice
+        {
+            Id = Guid.NewGuid().ToString(),
+            CustomerId = dto.CustomerId,
+            AmountCents = dto.AmountCents,
+            DueDate = dto.DueDate,
+            Description = dto.Description!,
+            PublicId = Guid.NewGuid().ToString()
+        };
         db.Invoices.Add(invoice);
         await db.SaveChangesAsync();
 
@@ -34,7 +41,7 @@ public class InvoicesController(InvoiceDb db) : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> Update(string id, Invoice updatedInvoice)
+    public async Task<ActionResult> Update(string id, [FromBody] Invoice updatedInvoice)
     {
         if (!string.Equals(id, updatedInvoice.Id, StringComparison.OrdinalIgnoreCase))
         {
