@@ -35,7 +35,7 @@ public class Datagen(CustomerDb customerDb, InvoiceDb invoiceDb)
                 {
                     Id = Guid.NewGuid().ToString(),
                     CustomerId = customer.Id,
-                    AmountCents = Random.Shared.Next(1000, 1000000),
+                    AmountCents = Random.Shared.Next(1000) * 10000,
                     Description = "test description",
                     PublicId = "public-id",
                     DueDate = DateTime.Now.AddDays(-Random.Shared.Next(100))

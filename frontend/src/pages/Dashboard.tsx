@@ -1,4 +1,4 @@
-import InvoiceList from "./InvoiceList";
+import InvoiceList from "../components/InvoiceList";
 
 export default function Dashboard() {
   return (

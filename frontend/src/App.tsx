@@ -1,8 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Login from "./components/Login";
-import Dashboard from "./components/Dashboard";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import InvoicePage from "./components/InvoicePage";
+import InvoicePage from "./pages/InvoicePage";
 import { Toaster } from "sonner";
 
 const queryClient = new QueryClient({

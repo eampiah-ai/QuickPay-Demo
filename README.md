@@ -1,5 +1,3 @@
----
-
 # **QuickPay – Product Specification**
 
 ## **1. Overview**
