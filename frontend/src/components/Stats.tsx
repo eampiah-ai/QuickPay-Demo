@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import axios, { type AxiosResponse } from "axios";
+import { decimalFormatter } from "./InvoiceList";
 
 interface DashCardProps {
   title: string;
-  value: string;
+  value: number;
   commentLine1?: string;
-  commentLine2?: string;
+  isMonetaryValue?: boolean;
 }
 
 const fetchStats = async () =>
@@ -26,7 +27,11 @@ export default function Stats() {
         className="flex flex-col border border-black border-solid rounded-md p-5 m-5 min-w-xs max-w-xs"
       >
         <p className="text-sm">{card.title}</p>
-        <h1 className="text-[2em]">{card.value}</h1>
+        <h1 className="text-[2em]">
+          {card.isMonetaryValue
+            ? `$${decimalFormatter.format(card.value / 100)}`
+            : card.value}
+        </h1>
         <p className="text-sm">{card.commentLine1}</p>
       </div>
     );

@@ -1,5 +1,3 @@
-// RHFSelect.tsx
-
 import { Controller, useFormContext } from "react-hook-form";
 import {
   Select,
@@ -9,14 +7,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface SelectOption {
+export interface SelectOption {
   value: string;
   label: string;
 }
 
 interface RHFSelectProps {
   name: string;
-  label: string;
   placeholder?: string;
   disabled?: boolean;
   value?: string;

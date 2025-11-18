@@ -1,6 +1,8 @@
 import { useForm } from "react-hook-form";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
+import axios, { HttpStatusCode, type AxiosResponse } from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface LoginData {
   username: string;
@@ -9,24 +11,17 @@ interface LoginData {
 
 export default function Login() {
   const { register, handleSubmit } = useForm<LoginData>();
+  const navigate = useNavigate();
 
   const login = (data: LoginData) => {
-    const request = new Request("http://localhost:5250/api/auth", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    fetch(request).then((response) => {
-      if (!response.ok) {
-        console.log("Bad response");
-        return;
-      }
-
-      response.json().then(console.log);
-    });
+    axios
+      .post<any, AxiosResponse<string>>("http://localhost:5250/api/auth", data)
+      .then((response) => {
+        if (response.status === HttpStatusCode.Ok) {
+          console.log(response.data);
+          navigate("/dashboard");
+        }
+      });
   };
 
   return (

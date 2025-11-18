@@ -4,6 +4,7 @@ using api.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Stripe;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
@@ -35,8 +36,9 @@ builder.Services.AddDbContext<InvoiceDb>(options =>
 builder.Services.AddDbContext<PaymentDb>(options =>
     options.UseInMemoryDatabase("PaymentDb"));
 
-// configure config
+// configure sections
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<StripeConfig>(builder.Configuration.GetSection("Stripe"));
 
 // add JWT authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>

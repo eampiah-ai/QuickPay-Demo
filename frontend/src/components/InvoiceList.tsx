@@ -29,6 +29,7 @@ import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { MdAddCircle } from "react-icons/md";
+import axios, { type AxiosResponse } from "axios";
 
 export interface Invoice {
   id: string;
@@ -36,15 +37,22 @@ export interface Invoice {
   customerId: string;
   amountCents: number;
   description?: string;
+  status: string;
   dueDate: string;
   createdAt?: string;
 }
 
-async function fetchInvoices() {
-  return await fetch("http://localhost:5250/api/invoices").then((res) =>
-    res.json()
-  );
-}
+export const decimalFormatter = new Intl.NumberFormat("en-us", {
+  style: "decimal",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+  useGrouping: true,
+});
+
+const fetchInvoices = async () =>
+  await axios
+    .get<any, AxiosResponse<Invoice[]>>("http://localhost:5250/api/invoices")
+    .then((response) => response.data);
 
 export default function InvoiceList() {
   const navigate = useNavigate();
@@ -54,6 +62,7 @@ export default function InvoiceList() {
   const toastType = searchParams.get("toast");
   const message = searchParams.get("message");
   const didShowToast = useRef(false);
+
   useEffect(() => {
     if (didShowToast.current) return;
     if (toastType && message) {
@@ -81,6 +90,8 @@ export default function InvoiceList() {
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: ["invoices"],
     queryFn: fetchInvoices,
+    initialData: [],
+    staleTime: 0,
   });
 
   const deleteInvoice = (invoiceId: string) => {
@@ -101,9 +112,26 @@ export default function InvoiceList() {
     });
   };
 
+  const makePayment = async (invoiceId: string) => {
+    const url = await axios
+      .get<any, AxiosResponse<string>>(
+        `http://localhost:5250/api/payments/${invoiceId}/create-checkout-session`
+      )
+      .then((response) => response.data);
+    window.location.href = url;
+  };
+
   const columns: ColumnDef<Invoice>[] = [
-    { accessorKey: "id", header: "ID" },
-    { accessorKey: "amountCents", header: "Amount" },
+    { accessorKey: "publicId", header: "ID" },
+    {
+      accessorKey: "amountCents",
+      header: "Amount",
+      cell: ({ row }) => {
+        return (
+          <div>${decimalFormatter.format(row.original.amountCents / 100)}</div>
+        );
+      },
+    },
     {
       accessorKey: "dueDate",
       header: "Due Date",
@@ -118,6 +146,7 @@ export default function InvoiceList() {
         );
       },
     },
+    { accessorKey: "status", header: "Status" },
     {
       id: "actions",
       cell: ({ row }) => {
@@ -138,9 +167,12 @@ export default function InvoiceList() {
               >
                 View invoice details
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => deleteInvoice(invoice.id)}>
                 Delete
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => makePayment(invoice.publicId)}>
+                Make payment
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -163,9 +195,12 @@ export default function InvoiceList() {
     <div className="p-5">
       <div className="flex flex-row items-center gap-5">
         <h1 className="text-[3em]">Invoices</h1>
-        <Button className="cursor-pointer" onClick={() => navigate("/invoices/new")}>
+        <Button
+          className="cursor-pointer"
+          onClick={() => navigate("/invoices/new")}
+        >
           <MdAddCircle />
-          New Invoice
+          New
         </Button>
       </div>
       <Table>

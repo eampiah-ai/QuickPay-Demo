@@ -5,31 +5,29 @@ import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo } from "react";
-import { RHFSelect } from "../components/ui/RHFSelect";
+import { RHFSelect, type SelectOption } from "../components/ui/RHFSelect";
 import { Textarea } from "../components/ui/textarea";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import axios, { type AxiosResponse } from "axios";
 import { format } from "date-fns";
+import { IoArrowBackCircle } from "react-icons/io5";
 
-function fetchCustomers() {
-  return fetch("http://localhost:5250/api/customers").then((res) => res.json());
-}
+const fetchCustomers = async () =>
+  await axios
+    .get<any, AxiosResponse<Customer[]>>("http://localhost:5250/api/customers")
+    .then((response) => response.data);
 
 const isNewId = (id?: string) => id === "new";
 
-async function fetchInvoice(id?: string) {
+const fetchInvoice = async (id?: string) => {
   if (isNewId(id)) return {} as Invoice;
 
-  const request = new Request(`http://localhost:5250/api/invoices/${id}`);
-  return await fetch(request).then(async (response) => {
-    if (!response.ok) {
-      console.log("Error fetching invoice");
-      return;
-    }
-
-    return await response.json();
-  });
-}
+  return await axios
+    .get<any, AxiosResponse<Invoice>>(
+      `http://localhost:5250/api/invoices/${id}`
+    )
+    .then((response) => response.data);
+};
 
 const createInvoice = async (invoice: Invoice) =>
   await axios.post("http://localhost:5250/api/invoices", invoice);
@@ -77,26 +75,31 @@ export default function InvoicePage() {
       ),
   });
 
-  const { data } = useQuery({
+  const { data: customers } = useQuery({
     queryKey: ["customers"],
     queryFn: fetchCustomers,
   });
 
   const customerSelect = useMemo(() => {
-    if (!data?.length) return;
-    const customerOptions = data.map((customer: Customer) => {
-      return { label: customer.name, value: customer.id };
-    });
-    return (
-      <RHFSelect
-        name="customerId"
-        options={customerOptions}
-        label="Select Customer"
-        placeholder="Choose a customer"
-        value={invoice?.customerId}
-      />
+    if (!customers?.length) return;
+    const customerOptions: SelectOption[] = customers.map(
+      (customer: Customer) => {
+        return { label: customer.name, value: customer.id };
+      }
     );
-  }, [data]);
+
+    return (
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="customerId">Customer</Label>
+        <RHFSelect
+          name="customerId"
+          options={customerOptions}
+          placeholder="Choose a customer"
+          value={invoice?.customerId}
+        />
+      </div>
+    );
+  }, [customers, invoice]);
 
   // set default values on fetch
   useEffect(() => {
@@ -125,31 +128,47 @@ export default function InvoicePage() {
 
   return (
     <div className="flex flex-col gap-5 p-5">
-      <h1 className="text-xl text-center">Invoice</h1>
+      <div className="flex justify-between items-center w-full mb-6">
+        <IoArrowBackCircle
+          className="cursor-pointer text-[2em]"
+          onClick={() => navigate(-1)}
+        />
+        <div className="text-[3em] font-bold text-gray-800 flex-grow text-center">
+          {invoice?.publicId}
+        </div>
+      </div>
       <FormProvider {...methods}>
         <form
-          className="flex flex-col gap-5"
+          className="flex flex-col gap-7"
           onSubmit={methods.handleSubmit(submitInvoice)}
         >
-          <Label htmlFor="amount">Amount</Label>
-          <Input
-            type="number"
-            id="amount"
-            placeholder="Amount"
-            {...methods.register("amountCents")}
-          />
-          <Label htmlFor="dueDate">Due Date</Label>
-          <Input
-            type="date"
-            id="dueDate"
-            placeholder="Due Date"
-            {...methods.register("dueDate")}
-          />
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="amount">Amount</Label>
+            <Input
+              type="number"
+              id="amount"
+              placeholder="Amount"
+              {...methods.register("amountCents")}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="dueDate">Due Date</Label>
+            <Input
+              type="date"
+              id="dueDate"
+              placeholder="Due Date"
+              {...methods.register("dueDate")}
+            />
+          </div>
           {customerSelect}
-          <Textarea
-            placeholder="Description"
-            {...methods.register("description")}
-          />
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              placeholder="Description"
+              {...methods.register("description")}
+            />
+          </div>
           <Button type="submit" className="cursor-pointer">
             Save
           </Button>

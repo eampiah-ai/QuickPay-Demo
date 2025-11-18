@@ -9,7 +9,7 @@ namespace api.Controllers;
 [Route("api/[controller]")]
 public class StatsController(CustomerDb customerDb, InvoiceDb invoiceDb) : ControllerBase
 {
-    [HttpGet()]
+    [HttpGet]
     public async Task<ActionResult> GetStats()
     {
         var stats = new List<StatsDto>
@@ -31,7 +31,7 @@ public class StatsController(CustomerDb customerDb, InvoiceDb invoiceDb) : Contr
         return new StatsDto
         {
             Title = "Number of customers",
-            Value = count.ToString()
+            Value = count
         };
     }
 
@@ -43,13 +43,15 @@ public class StatsController(CustomerDb customerDb, InvoiceDb invoiceDb) : Contr
         return new StatsDto
         {
             Title = string.Format("Total {0} invoice amount", status),
-            Value = string.Format("${0:N0}", amount)
+            Value = amount,
+            IsMonetaryValue = true
         };
     }
 
     public class StatsDto
     {
         public string Title { get; set; }
-        public string Value { get; set; }
+        public int Value { get; set; }
+        public bool IsMonetaryValue { get; set; }
     }
 }

@@ -34,11 +34,11 @@ public class Datagen(CustomerDb customerDb, InvoiceDb invoiceDb)
                 var invoice = new Invoice()
                 {
                     Id = Guid.NewGuid().ToString(),
-                    CustomerId = customer.Id,
-                    AmountCents = Random.Shared.Next(1000) * 10000,
+                    Customer = customer,
+                    AmountCents = Random.Shared.Next(10000) * 100,
                     Status = (Status)Enum.GetValues(typeof(Status)).GetValue(Random.Shared.Next(Enum.GetValues(typeof(Status)).Length)),
                     Description = "test description",
-                    PublicId = Guid.NewGuid().ToString(),
+                    PublicId = InvoiceIdGenerator.GeneratePublicId(),
                     DueDate = Random.Shared.Next(10) % 3 == 0 ? DateTime.Now.AddDays(Random.Shared.Next(100)) : DateTime.Now.AddDays(-Random.Shared.Next(100))
                 };
                 invoices.Add(invoice);
